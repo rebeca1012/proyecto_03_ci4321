@@ -144,6 +144,16 @@ function hideParticles() {
   particleSystem.removeFromScene(scene);
 }
 
+// Makes projectile go boom
+function hanabi(projectileMesh){ 
+  scene.remove(projectileMesh);
+  
+  // boom
+  particleSystem.showParticles(scene,  projectileMesh.position);
+  // Hide particles after 3 seconds
+  setTimeout(hideParticles, 1200);
+}
+
 //Projectile pooling
 const projectiles = [];
 
@@ -314,14 +324,6 @@ if (keys.Space){
 	//Create and Fire projectile from the firing point
 	fireProjectile(firingPoint, firingDirection);
 
-  // THIS IS HERE FOR TESTING PURPOSES ONLY
-  // reactivate the particleSystem
-  particleSystem.showParticles(scene);
-
-  // Hide particles after 3 seconds
-  setTimeout(hideParticles, 1200);
-  
-
 	lastShotTime = currentTime;
 	}
 }
@@ -422,7 +424,7 @@ function fireProjectile(position, direction) {
    // If there are too many projectile, delete the oldest one
    if (projectiles.length >= maxProjectiles) {
        const oldestProjectile = projectiles.shift();
-       scene.remove(oldestProjectile.mesh);
+       hanabi(oldestProjectile.mesh);
    }
 
    // Create a new projectile and add it to the scene
@@ -483,7 +485,7 @@ function updateElements(deltaTime){
 	  obstacles.forEach(obstacle => {
 		  if (obstacle.userData.boundingBox.intersectsBox(projectile.boundingBox)) {
 			  //remove projectile
-			  scene.remove(projectile.mesh);
+			  hanabi(projectile.mesh);
 			  projectiles.splice(projectiles.indexOf(projectile), 1);
 
 			  //remove obstacle
