@@ -26,19 +26,30 @@ export class ParticleSystem {
     // Create particle geometry
     const particles = new THREE.BufferGeometry();
     const positions = new Float32Array(this.particleCount * 3);
+    const colors = new Float32Array(this.particleCount * 3);
 
     for (let i = 0; i < this.particleCount; i++) {
       positions[i * 3] = this.emitterPosition.x + (Math.random() - 0.5) * 2;
       positions[i * 3 + 1] = this.emitterPosition.y + (Math.random() - 0.5) * 2;
       positions[i * 3 + 2] = this.emitterPosition.z + (Math.random() - 0.5) * 2;
+
+      // Generate random color in HSV format and convert to RGB
+      const hue = Math.random() * 0.1; // Orange to red hue range
+      const color = new THREE.Color();
+      color.setHSL(hue, 1.0, 0.5); // Full saturation and medium lightness
+
+      colors[i * 3] = color.r;
+      colors[i * 3 + 1] = color.g;
+      colors[i * 3 + 2] = color.b;
     }
 
     particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     // Create particle material
     const particleMaterial = new THREE.PointsMaterial({
-      color: 0xffffff,
       size: this.particleSize,
+      vertexColors: true, // So the set colors apply
     });
 
     // Create particle system
