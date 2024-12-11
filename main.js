@@ -7,6 +7,7 @@ import { createObstacleBox, createCircularTarget } from './obstacles';
 import { generateRotationMatrix, generateTranslationMatrix } from './transformationAssistance';
 import { Tank, Projectile, parabolicProjectile, projectileSpeed } from './tankAndProjectiles';
 import { createCharacterSprite } from './graphicsUI';
+import { ParticleSystem } from './particles';
 
 
 //defining scene, camera and renderer
@@ -134,6 +135,11 @@ lampPositions.forEach(position => {
   scene.add(lamp);
   floorLamps.push(lamp);
 });
+
+// Create particle system with a specific emitter position
+const emitterPosition = new THREE.Vector3(0, 0, 0);
+const particleSystem = new ParticleSystem(1000, 0.1, emitterPosition);
+particleSystem.addToScene(scene);
 
 //Projectile pooling
 const projectiles = [];
@@ -453,43 +459,46 @@ function updateFloorLights() {
 //this function updates elements that dont require user input to work
 function updateElements(deltaTime){
 
-//projectiles
-projectiles.forEach(projectile => {
-	projectile.update(deltaTime);
-});
+  // Update particle system
+  particleSystem.updateParticles();
 
-//collision detection (this is one of the codes of all time)
-projectiles.forEach(projectile => {
-	obstacles.forEach(obstacle => {
-		if (obstacle.userData.boundingBox.intersectsBox(projectile.boundingBox)) {
-			//remove projectile
-			scene.remove(projectile.mesh);
-			projectiles.splice(projectiles.indexOf(projectile), 1);
+  //projectiles
+  projectiles.forEach(projectile => {
+	  projectile.update(deltaTime);
+  });
 
-			//remove obstacle
-			scene.remove(obstacle);
-			obstacles.splice(obstacles.indexOf(obstacle), 1);
+  //collision detection (this is one of the codes of all time)
+  projectiles.forEach(projectile => {
+	  obstacles.forEach(obstacle => {
+		  if (obstacle.userData.boundingBox.intersectsBox(projectile.boundingBox)) {
+			  //remove projectile
+			  scene.remove(projectile.mesh);
+			  projectiles.splice(projectiles.indexOf(projectile), 1);
 
-			//update obstacle counter
-			guiScene.remove(characterSprite);  // 48 is ASCII code for '0'
-			characterSprite = createCharacterSprite(String.fromCharCode(48 + obstacles.length), numberTexture);
-			characterSprite.position.set(-window.innerWidth / 2 + textWidth / 2 + textOffset.x, window.innerHeight / 2 - textHeight / 2 - textOffset.y, 0);
-			guiScene.add(characterSprite);
-		}
-	});
-});
+			  //remove obstacle
+  			scene.remove(obstacle);
+	  		obstacles.splice(obstacles.indexOf(obstacle), 1);
 
-//constant movement of the spotlight
-const lightMovement = Math.sin(movingLightSpeed) / 7; // Adjust the multipliar to control the range of movement
-movingLightSpeed += deltaTime * 0.5; // Adjust the multiplier to control the speed
+	  		//update obstacle counter
+		  	guiScene.remove(characterSprite);  // 48 is ASCII code for '0'
+			  characterSprite = createCharacterSprite(String.fromCharCode(48 + obstacles.length), numberTexture);
+  			characterSprite.position.set(-window.innerWidth / 2 + textWidth / 2 + textOffset.x, window.innerHeight / 2 - textHeight / 2 - textOffset.y, 0);
+	  		guiScene.add(characterSprite);
+		  }
+	  });
+  });
 
-// Apply the new position to the spotlight's target
-// movingLight.target.position.set(targetX, 0, movingLight.target.position.z);
-// movingLight.target.updateMatrixWorld(); // Ensure the target's matrix is updated
-movingLight.target.position.applyMatrix4(generateTranslationMatrix(new THREE.Vector3(1, 0, 0), movingLight.target, lightMovement, true));
+  //constant movement of the spotlight
+  const lightMovement = Math.sin(movingLightSpeed) / 7; // Adjust the multipliar to control the range of movement
+  movingLightSpeed += deltaTime * 0.5; // Adjust the multiplier to control the speed
+
+  // Apply the new position to the spotlight's target
+  // movingLight.target.position.set(targetX, 0, movingLight.target.position.z);
+  // movingLight.target.updateMatrixWorld(); // Ensure the target's matrix is updated
+  movingLight.target.position.applyMatrix4(generateTranslationMatrix(new THREE.Vector3(1, 0, 0), movingLight.target, lightMovement, true));
 
 
- updateFloorLights();
+  updateFloorLights();
 }
 //render and animation function
 let then = 0;
