@@ -6,6 +6,8 @@ export class ParticleSystem {
     this.particleSize = particleSize;
     this.emitterPosition = emitterPosition;
     this.particleSystem = null;
+    // Store velocities for each particle
+    this.velocities = new Float32Array(this.particleCount * 3); 
   }
 
   setPosition(position) {
@@ -27,11 +29,13 @@ export class ParticleSystem {
     const particles = new THREE.BufferGeometry();
     const positions = new Float32Array(this.particleCount * 3);
     const colors = new Float32Array(this.particleCount * 3);
+    const spawnRange = 0.5;  // range will be -spawnRange to spawnRange
+    const speedRange = 0.1; // speed will be 0 to speedRange
 
     for (let i = 0; i < this.particleCount; i++) {
-      positions[i * 3] = this.emitterPosition.x + (Math.random() - 0.5) * 2;
-      positions[i * 3 + 1] = this.emitterPosition.y + (Math.random() - 0.5) * 2;
-      positions[i * 3 + 2] = this.emitterPosition.z + (Math.random() - 0.5) * 2;
+      positions[i * 3] = this.emitterPosition.x + (Math.random() - 0.5) * spawnRange;
+      positions[i * 3 + 1] = this.emitterPosition.y + (Math.random() - 0.5) * spawnRange;
+      positions[i * 3 + 2] = this.emitterPosition.z + (Math.random() - 0.5) * spawnRange;
 
       // Generate random color in HSV format and convert to RGB
       const hue = Math.random() * 0.1; // Orange to red hue range
@@ -41,6 +45,16 @@ export class ParticleSystem {
       colors[i * 3] = color.r;
       colors[i * 3 + 1] = color.g;
       colors[i * 3 + 2] = color.b;
+
+      // Calculate initial velocity so they move away from center
+      const direction = new THREE.Vector3(
+        positions[i * 3] - this.emitterPosition.x,
+        positions[i * 3 + 1] - this.emitterPosition.y,
+        positions[i * 3 + 2] - this.emitterPosition.z
+      ).normalize();
+      this.velocities[i * 3] = direction.x * Math.random() * speedRange;
+      this.velocities[i * 3 + 1] = direction.y * Math.random() * speedRange;
+      this.velocities[i * 3 + 2] = direction.z * Math.random() * speedRange;
     }
 
     particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -78,10 +92,9 @@ export class ParticleSystem {
 
     const positions = this.particleSystem.geometry.attributes.position.array;
     for (let i = 0; i < this.particleCount; i++) {
-      positions[i * 3 + 1] -= 0.01;
-      if (positions[i * 3 + 1] < -5) {
-        positions[i * 3 + 1] = 5;
-      }
+        positions[i * 3] += this.velocities[i * 3];
+        positions[i * 3 + 1] += this.velocities[i * 3 + 1];
+        positions[i * 3 + 2] += this.velocities[i * 3 + 2];
     }
     this.particleSystem.geometry.attributes.position.needsUpdate = true;
   }

@@ -137,7 +137,7 @@ lampPositions.forEach(position => {
 });
 
 const emitterPosition = new THREE.Vector3(0, 3, 0);
-const particleSystem = new ParticleSystem(1000, 0.1, emitterPosition);
+const particleSystem = new ParticleSystem(250, 0.1, emitterPosition);
 
 //function to hide particles that can be put into a setTimeout
 function hideParticles() {
@@ -319,7 +319,7 @@ if (keys.Space){
   particleSystem.showParticles(scene);
 
   // Hide particles after 3 seconds
-  setTimeout(hideParticles, 3000);
+  setTimeout(hideParticles, 1200);
   
 
 	lastShotTime = currentTime;
