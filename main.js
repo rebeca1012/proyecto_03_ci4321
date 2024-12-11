@@ -136,10 +136,13 @@ lampPositions.forEach(position => {
   floorLamps.push(lamp);
 });
 
-// Create particle system with a specific emitter position
-const emitterPosition = new THREE.Vector3(0, 0, 0);
+const emitterPosition = new THREE.Vector3(0, 3, 0);
 const particleSystem = new ParticleSystem(1000, 0.1, emitterPosition);
-particleSystem.addToScene(scene);
+
+//function to hide particles that can be put into a setTimeout
+function hideParticles() {
+  particleSystem.removeFromScene(scene);
+}
 
 //Projectile pooling
 const projectiles = [];
@@ -310,6 +313,14 @@ if (keys.Space){
 
 	//Create and Fire projectile from the firing point
 	fireProjectile(firingPoint, firingDirection);
+
+  // THIS IS HERE FOR TESTING PURPOSES ONLY
+  // reactivate the particleSystem
+  particleSystem.showParticles(scene);
+
+  // Hide particles after 3 seconds
+  setTimeout(hideParticles, 3000);
+  
 
 	lastShotTime = currentTime;
 	}

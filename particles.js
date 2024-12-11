@@ -6,8 +6,21 @@ export class ParticleSystem {
     this.particleSize = particleSize;
     this.emitterPosition = emitterPosition;
     this.particleSystem = null;
-    this.initParticles();
   }
+
+  setPosition(position) {
+    this.emitterPosition = position;
+  }
+
+  // Function to show particles
+    showParticles(scene, position = this.emitterPosition) {
+        
+        if (this.particleSystem) this.removeFromScene(scene);
+        
+        this.setPosition(position);
+        this.initParticles();
+        this.addToScene(scene);
+    }
 
   initParticles() {
     // Create particle geometry
@@ -33,17 +46,25 @@ export class ParticleSystem {
   }
 
   addToScene(scene) {
-    scene.add(this.particleSystem);
+    if (this.particleSystem) {
+        scene.add(this.particleSystem);
+    }
+    else console.log("You can't add particles before initializing them!!");
   }
 
   removeFromScene(scene) {
-    scene.remove(this.particleSystem);
-    this.particleSystem.geometry.dispose();
-    this.particleSystem.material.dispose();
-    this.particleSystem = null;
+    if (this.particleSystem) {
+        scene.remove(this.particleSystem);
+        this.particleSystem.geometry.dispose();
+        this.particleSystem.material.dispose();
+        this.particleSystem = null;
+      }
+    else console.log("There is no particle system to remove!!");
   }
 
   updateParticles() {
+    if (! this.particleSystem) return;
+
     const positions = this.particleSystem.geometry.attributes.position.array;
     for (let i = 0; i < this.particleCount; i++) {
       positions[i * 3 + 1] -= 0.01;
