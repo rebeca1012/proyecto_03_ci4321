@@ -150,7 +150,7 @@ function hanabi(projectileMesh){
   
   // boom
   particleSystem.showParticles(scene,  projectileMesh.position);
-  // Hide particles after 3 seconds
+  // Hide particles after a short time in miliseconds
   setTimeout(hideParticles, 1200);
 }
 

@@ -1,5 +1,7 @@
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js';
 
+// This particle system currently is just to simulate a simple explosion with red-ish particle that
+// go outward from the emitter's position
 export class ParticleSystem {
   constructor(particleCount = 1000, particleSize = 0.1, emitterPosition = new THREE.Vector3(0, 0, 0)) {
     this.particleCount = particleCount;
